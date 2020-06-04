@@ -6,6 +6,7 @@ Features:
 -click : framework used to make CLI applications in python
 -requests: http library to work with http requests
 
-#example 
+pip install -r requirements.txt
+
 
 python index.py "batman"
