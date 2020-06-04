@@ -1,7 +1,6 @@
 import click
 import requests
-
-
+import time
 def getBooks(query):
     # Function to get the books from the API
     info = {}
@@ -28,6 +27,7 @@ def parseInfo(info):
 @click.command()
 @click.argument('name')
 def main(name):
+    start  = time.time()
     # Displays all the information related with the query 
     info = getBooks(name)
     totalBooks = info.get("totalItems")
@@ -39,6 +39,6 @@ def main(name):
     for count,book in enumerate(books, start=1):
         info = book.get('volumeInfo')
         click.echo(f'{count}-{parseInfo(info)}'  )
-
+    print(time.time() - start)
 if __name__== "__main__":
     main()
