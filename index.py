@@ -1,6 +1,10 @@
 import click
 import requests
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import threading
+
+
 def getBooks(query):
     # Function to get the books from the API
     info = {}
@@ -17,8 +21,10 @@ def getBooks(query):
     
 def parseInfo(info):
     #returns specific book information
+
     book = {}
     attrs = ['title','authors','description','categories']
+
     for attr in attrs: 
         book[attr] = info.get(attr)
     return book
@@ -28,17 +34,26 @@ def parseInfo(info):
 @click.argument('name')
 def main(name):
     start  = time.time()
+   
     # Displays all the information related with the query 
-    info = getBooks(name)
+    info = getBooks(name) # Gets the books
     totalBooks = info.get("totalItems")
     books = info.get("items")
     # displays books that contains the query 
     click.echo(f'TOTAL OF BOOKS FOUND: {totalBooks}')
     click.echo("BOOKS FOUND: ")
-    # Displays the first 10 books found
-    for count,book in enumerate(books, start=1):
-        info = book.get('volumeInfo')
-        click.echo(f'{count}-{parseInfo(info)}'  )
-    print(time.time() - start)
+    
+    book_list = [book.get('volumeInfo') for book in books] # Para cada libro deveulve
+    executor = ThreadPoolExecutor(100)
+    result = list(executor.map(parseInfo,book_list))
+
+    for book in result:
+         click.echo(book)
+         click.echo("****************************************")
+         
+    #Displays the first 10 books found
+    # for count,book in enumerate(books, start=1):
+    #     info = book.get('volumeInfo')
+    #     click.echo(f'{count}-{parseInfo(info)}')
 if __name__== "__main__":
     main()
